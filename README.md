@@ -1,0 +1,1 @@
+Ongoing project to get tags for top 1000 artists from Last.fm and find similar tags and artists
