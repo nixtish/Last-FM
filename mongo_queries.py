@@ -5,6 +5,7 @@ import pymongo
 import json
 import time
 from pprint import pprint
+from bson.code import Code
 
 """ Setup datasbe connection and get get collection object"""
 try:
@@ -20,8 +21,7 @@ lastfm_db_obj = con_obj.lastfmdb                              # lastfmdb is the 
 existing_test_collection = lastfm_db_obj.temp_tags_only3      # here "temp_tags_only3" is the name of collection that exists in lastfmdb
 
 
-
-"""Methods to get various different type of results/information from the dataset"""
+"""Methods to get various different types of results/information from the dataset"""
 
 def listAllDocs(collection_name):
 	""" Method to list all documents in a collection, 
@@ -49,40 +49,68 @@ def getArtistsForAnArrayOfTags(collection_name, tag_array):
 	for doc in collection_name.find({"toptags.tag.name": { '$all':tag_array}},{"_id":"1", "toptags.@attr.artist":"1"}):
 		print doc
 
-def getArtistsForAnArrayOfTagsAndCountValue(collection_name, tag_array, count_value):
-	"""This method returns all artists that have a similar set of tags and also the tags have a value greater than 
-	a given count_value, so higher the count value means higher fidelity of tags for the artists and thus the artists returned
-	can be called similar or associated. Higher the count_value greater the association"""
-	for doc in collection_name.find({'$and': [{"toptags.tag.name":tag_array}, {"toptags.tag.count":{'$gte':count_value}}]},{"_id":"1","toptags.@attr.artist":"1"}):
-		print doc
-        
-def computeSimilarityBetweenArtists(collection_name, artist_name_list):
-	""" This method returns computed simila between artists passed as a list in the artist_name_list paramter """
-	pass
+def getAllDistinctTags(collection_name):
+	""" Test Method to get all distinct tags in the dataset"""
+	for doc in collection_name.distinct("toptags.tag.name"):
+		print doc		
 
+
+""" To be fixed """
+
+# def getSimilarArtistForaTagandCountValue(collection_name, tag_name,count_threshold):
+# 	""" Method that would return a collection of artists that are similar based on the tag values,
+# 	the results can be refined by increasing the count_threshold"""
+# 	for doc in collection_name.find({'$and':{"toptags.tag.name":tag_name},{"toptags.tag.count":"100"}},{"_id":1}):
+# 		pprint (doc)
+	
+
+# def getSimilarArtistsForAnArrayOfTagsAndCountValue(collection_name, tag_array, count_value):
+# 	"""This method returns all artists that have a similar set of tags and also the tags that have a value greater than 
+# 	a given count_value, a higher count value means higher fidelity of tags for the artists and thus the artists returned
+# 	can be called similar or associated. Higher the count_value greater the artist association"""
+# 	# here you have to specify that only for the tags in the array you have to check the count_value condition
+# 	# Use $elemMatch
+# 	"""
+# 		collection_name.find( {
+# 								"toptags.artist": {$all : [
+# 														{"$elemMatch" : {"name":tag_array, "count": {'$gt': count_value}}},
+														
+# 														]}
+# 			)
+# 		}
+# 	"""
+# 	for doc in collection_name.find({"toptags.tag.name":{'$all':tag_array},{"toptags.tag.count"}},{"_id":"1", "toptags.@attr.artist":"1"}): 
+# 		print "x"
+# 		print doc
+
+       #	for doc in collection_name.find({'$and': [{"toptags.tag.name":tag_array}, {"toptags.tag.count":{'$gte':count_value}}]},{"_id":"1","toptags.@attr.artist":"1"}):
+ 
 def findMostFrequentTags(collection_name):
-	"""This method returns most frequently occuring tags in the dataset and the number of times they appear"""
+	"""This method returns most frequently occuring tags in the dataset and the number of times they appear
+		as well as there total tag count."""
+	# Use Map Reduce http://stackoverflow.com/questions/7408602/whats-the-best-way-to-find-the-most-frequently-occurring-value-in-mongodb
+    # func_map = Code("function () {"
+    # 	"this.toptags.tags.name"})
 	pass
 
 def findMostPopularTags(collection_name, weighted_threshold):
 	"""This Method return the most popular tags and their confidence rating which is how many times
-	these tags occured in the dataset and they were also has  a tag count above the weighted_threshold """
+	these tags occured in the dataset and they also had a tag count above the weighted_threshold """
 	pass
 
-def getOneTag(collection_name):
-	""" Test Method to get one value with a given key test"""
-	for doc in collection_name.find({"toptags.tag.count":"100"}): # FINALLy
-	    pprint (doc)        
+def computeSimilarityBetweenArtists(collection_name, artist_name_list):
+    """ This method returns computed simila between artists passed as a list in the artist_name_list paramter """
+    pass
 
 def getSimilarArtist(collection_name, artist_name):
 	""" This method return artist names similar to a given artist based on my similarity metric"""
 	pass
 
 def getSimilarTags(collection_name):
-	"""Method to get similar tags from the dataset """
+	"""Method to get similar tags from the dataset i.e tags that co-exist """
 	pass
 
-	
+
 # Query to return common tags in each document
 # def returnCommonTags(collection_name):
 #   """ Method to return common tags amongst the documents in the collection"""
@@ -96,10 +124,6 @@ def getSimilarTags(collection_name):
 """ db.temp_tags_only1.aggregate([{$group: {_id:"$toptags.tag.name["pop"]", num:{$sum:1}}}]) """
 
 
-# for doc in existing_test_collection.find({}, {"artists":"Rihanna"}): # try if exists
-# 	pprint (doc)
-
-
 
 
 """Function Calls (Just toggle the comments to execute any function you want)"""
@@ -108,14 +132,16 @@ def getSimilarTags(collection_name):
 
 # returnCommonTags(existing_test_collection)                # Returns common tags amongst documents
 
-# getOneTag(existing_test_collection)						# Just get one tag based on the request	
+# getAllDistinctTags(existing_test_collection)				# Get all distinct tags in the dataset	
 
 # getTagNamesAboveThreshold(existing_test_collection, 20)	# function that return tags are above a certain threshold
 
 # listAllArtists(existing_test_collection)                  # method to list all artist names
 
-# getArtistsForTag(existing_test_collection, "pop")         # works
+getArtistsForTag(existing_test_collection, "pop")         # works
 
 # getArtistsForAnArrayOfTags(existing_test_collection, ['pop'])
 
-getArtistsForAnArrayOfTagsAndCountValue(existing_test_collection, ['pop'], 0)
+# getSimilarArtistsForAnArrayOfTagsAndCountValue(existing_test_collection, ['pop'], 0)
+
+# getSimilarArtistForaTagandCountValue(existing_test_collection, "pop", 30)

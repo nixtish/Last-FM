@@ -1,0 +1,20 @@
+"'shell command to update Count type to integer from string"
+
+
+db.up1000.find({                                      #up1000 is the collection name
+   "toptags.tag":{"$exists":true}}).forEach(function(x){
+    for(var i=0;i<x.toptags.tag.length;i++) {
+      db.collectionName.update(
+         { 
+             "_id": x._id, 
+             "toptags.tag.count": x.toptags.tag[i].count 
+         },
+         {
+             "$set": {
+               "toptags.tag.$.count":  
+                   parseInt(x.toptags.tag[i].count)
+             }
+         }
+      );
+  }
+})
