@@ -62,6 +62,7 @@ for line in f:
 		pass
 
 print db.temp_tags_1000.count() # no of documents in collection
+f.close()
 
 
 

@@ -41,7 +41,7 @@ for line in f:
 	except httplib.BadStatusLine: # handle bad status repsonse froom last fm server
 		pass
 	
-
+f.close()
 print for_count
 print pre_count
 print post_count
