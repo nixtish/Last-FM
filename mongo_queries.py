@@ -93,71 +93,12 @@ def getSimilarArtistForaTagListandCountValue(collection_name, tag_list, count_th
 		print "\n"
 
 
-
-
-""" To be fixed """
-
-def findMostPopularTags(collection_name, count_threshold):
-	"""This Method return the most popular tags and their confidence rating which is how many times
-	these tags occured in the dataset and they also had a tag count above the weighted_threshold """
-
-	for idx, val in enumerate(distinct_tags):
-		distinct_tags[idx] = { 
-		    "$elemMatch": 
-		        {"name":distinct_tags[idx],
-		         "count":{'$gte': count_threshold} 
-		         }
-		    }
-	for doc in collection_name.find(
-		    {"toptags.tag": {
-		    "$all": distinct_tags}},
-		    {"_id":1, "toptags.tag.name":"1"}):
-		print doc
-		print "\n"	    
+  
 	
 
-def getSimilarTags(collection_name):
-	"""Method to get similar tags from the dataset i.e tags that co-exist """
-	pass
-
-def getSimilarArtist(collection_name, artist_name):
-	""" This method return artist names similar to a given artist based on my similarity metric"""
-	pass
-
-
-def findMostFrequentTags(collection_name):
-	"""This method returns most frequently occuring tags in the dataset and the number of times they appear
-		as well as there total tag count."""
-	# Use Map Reduce http://stackoverflow.com/questions/7408602/whats-the-best-way-to-find-the-most-frequently-occurring-value-in-mongodb
-    # func_map = Code("function () {"
-    # 	"this.toptags.tags.name"})
-	pass
-
-
-def computeSimilarityBetweenArtists(collection_name, artist_name_list):
-    """ This method returns computed simila between artists passed as a list in the artist_name_list paramter """
-    pass
-
-
-def returnCommonTags(collection_name):
-  """ Method to return common tags amongst the documents in the collection"""
-    #for doc in existing_test_collection.collection.distinct():
- 
-    	
-def getTagNamesAboveThreshold(collection_name, count_threshold):
-	"""Method to return all tags above a certain tag_count threshold. Uses MongoDB aggregate query.
-		count_threshold takes an integer value between 0 and 100 """
-	#collection_name.aggregate([{ $group : {_id: "toptags.tag.name":"pop", num_pop:{$sum:1}}}])
-	pass
-
-""" db.temp_tags_only1.aggregate([{$group: {_id:"$toptags.tag.name["pop"]", num:{$sum:1}}}]) """
-
-
-
-#############################
 
 """Function Calls (Just toggle the comments to execute any function you want)
-	existing_test_collection value has been fixed above but you can optionally pass
+	existing_test_collection value has been fixed above but can optionally pass
 	db.collection_name as an argument"""
 
 # listAllDocs(existing_test_collection)                              # List all documents in a collection.
@@ -176,6 +117,89 @@ def getTagNamesAboveThreshold(collection_name, count_threshold):
 
 # getTagNamesAboveThreshold(existing_test_collection, 20)	         # function that return tags are above a certain threshold
 
-findMostPopularTags(existing_test_collection, 0)
 
 
+
+
+
+
+
+
+
+""" Unimplemented methods- To be fixed """
+# aggregation /map reduce will be used in most of these. along with $unwind, $group -- READ MONGO DOC
+"""
+
+
+
+def findMostPopularTags(collection_name, count_threshold):
+	# This Method return the most popular tags and their confidence rating which is how many times
+	#  these tags occured in the dataset and they also had a tag count above the weighted_threshold 
+
+	for idx, val in enumerate(distinct_tags):
+		distinct_tags[idx] = { 
+		    "$elemMatch": 
+		        {"name":distinct_tags[idx],
+		         "count":{'$gte': count_threshold} 
+		         }
+		    }
+	for doc in collection_name.find(
+		    {"toptags.tag": {
+		    "$all": distinct_tags}},
+		    {"_id":1, "toptags.tag.name":"1"}):
+		print doc
+		print "\n"	
+
+
+def getTagNamesAboveThreshold(collection_name, count_threshold):
+	#Method to return all tags above a certain tag_count threshold. Uses MongoDB aggregate query.
+	#	count_threshold takes an integer value between 0 and 100 
+
+	PIPELINE = [{"$unwind":"$toptags.tag"},{"$group":{"_id":"$toptags.tag.name", "count":{"$sum": 1}}}]
+	list(collection_name.aggregate(PIPELINE))
+
+	# WIll throw an error because of those "#text" values in the data set so $ unwind won't work, 
+	#	should I remove those values from the dataset??? -- DONE BAD VALUES REMOVED
+	# add count_threshold condition later, fix this for now
+
+
+def findMostFrequentTags(collection_name):
+	#This method returns most frequently occuring tags in the dataset and the number of times they appear,
+	#	as well as there total tag count.
+
+	# Use Map Reduce ??
+	# emit on one key
+	# and then sum across all documents ???    
+    pass
+
+def findMostPopularTags(collection_name, count_threshold):
+	#This Method return the most popular tags and their confidence rating which is how many times,
+	#   these tags occured in the dataset and they also had a tag count above the weighted_threshold 
+
+	# Find a all such tags that have a count > count_threshold
+	# once you have these calculate how many times such tag:count > count_threshold pairs existed across the dataset.
+	# divide by total no of documents to get a confidence rating
+	# can use aggregate and $group ??
+	pass
+
+
+def returnCommonTags(collection_name):
+    # Method to return common tags amongst the documents in the collection
+
+    # retuen set of most frequently co-existing tags 
+    # so first find tags that co-exist -- VERY EXPENSIVE, can use count to reduce computations but still, worst case would be bad.
+    # then find how many times they co-existed 
+    pass
+
+def getSimilarArtist(collection_name, artist_name):
+	# This method return artist names similar to a given artist based on my similarity metric(defined in pdf)
+	pass    
+
+def computeSimilarityBetweenArtists(collection_name, artist_name_list):
+    # This method returns computed simila between artists passed as a list in the artist_name_list paramter 
+
+    # from the input list, compute similarity between each possible pair
+    # iterate over list and compute similarity between two based on algorithm
+    pass
+
+""" 
