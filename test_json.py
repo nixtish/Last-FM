@@ -9,6 +9,6 @@ data = json.load(json_data)
 API_KEY =  data["creds"]["API Key"]
 Secret =  data["creds"]["Secret"]
 
-print API_KEY
-print Secret
+print "%r" % (API_KEY)
+print "%r" % (Secret)	
 
