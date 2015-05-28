@@ -40,8 +40,7 @@ print db.collection_names()
 # Last FM API credentials
 main_url = "http://ws.audioscrobbler.com/2.0/"                  # base URL for REST call
 
-
-main_url = "http://ws.audioscrobbler.com/2.0/"                  # base URL for REST call
+       
 json_data = open(os.path.join(os.path.dirname(os.getcwd()),'lastfm_creds.json'))
 data = json.load(json_data)
 API_KEY =  data["creds"]["API Key"]                             # assign API key from JSON object
